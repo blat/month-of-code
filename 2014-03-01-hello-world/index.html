@@ -1,0 +1,78 @@
+<html>
+    <head>
+        <title>Hello world</title>
+        <style>
+            body {
+                background: #111;
+                margin: 0;
+            }
+
+            #text {
+                position: absolute;
+                top: 30%;
+                width: 100%;
+                text-align: center;
+            }
+
+            #text .char {
+                font-family: monospace;
+                font-size: 42px;
+                color: white;
+                background: -moz-linear-gradient(bottom, #222 50%, #333 50%);
+                background: -webkit-linear-gradient(bottom, #222 50%, #333 50%);
+                background: linear-gradient(bottom, #222 50%, #333 50%);
+                border-radius: 3px;
+                display: inline-block;
+                width: 42px;
+                text-align: center;
+                margin: 5px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="text"></div>
+
+        <script type="text/javascript">
+            var text = "Hello world!";
+            var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!";
+
+            // Init
+            var textElement = document.getElementById("text")
+            for (var i = 0; i < text.length; i++) {
+                var charElement = document.createElement('span');
+                charElement.setAttribute("id", "char-" + i);
+                charElement.setAttribute("class", "char");
+                charElement.innerHTML = "&nbsp;";
+                textElement.appendChild(charElement);
+            }
+
+            // Animate
+            var max = 0;
+            var timer = setInterval(function() {
+                var run = false;
+                for (var i = 0; i < text.length && i <= max; i++) {
+
+                    var charElement = document.getElementById("char-" + i);
+                    var currentChar = charElement.innerHTML;
+                    var charIndex = abc.indexOf(currentChar);
+
+                    var nextChar = abc[++charIndex];
+
+                    var expectedChar = text[i].toUpperCase();
+                    var expectedIndex = abc.indexOf(expectedChar);
+
+                    if (charIndex <= expectedIndex) {
+                        charElement.innerHTML = nextChar;
+                    }
+
+                    if (charIndex < expectedIndex) {
+                        run = true;
+                    }
+                }
+                max++;
+                if (!run) clearInterval(timer);
+            }, 250);
+        </script>
+    </body>
+</html>
