@@ -1,0 +1,353 @@
+<html>
+    <head>
+        <title>Border</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <style>
+            body {
+                padding: 24px;
+                margin: 0;
+                background: green;
+            }
+
+            #sidebar {
+                float: right;
+                width: 200px;
+                height: 100%;
+                padding-left: 20px;
+                font-family: sans-serif;
+                color: white;
+            }
+
+            #snake {
+                margin-right: 220px;
+                position: relative;
+                height: 100%;
+                background: white;
+                cursor: pointer;
+            }
+
+            .dot {
+                position: absolute;
+                background: red;
+                z-index: 10;
+            }
+
+            .line {
+                position: absolute;
+                background: black;
+            }
+
+            .wall {
+                position: absolute;
+                background: green;
+            }
+
+            .help {
+                position: absolute;
+                bottom: 20px;
+            }
+
+            dl dt {
+                display: inline-block;
+                width: 80px;
+                text-align: right;
+                padding-right: 10px;
+            }
+
+            dl dd {
+                display: inline-block;
+                width: 100px;
+                font-weight: bold;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="sidebar">
+            <dl>
+                <dt>Time</dt>
+                <dd id="time"></dd>
+                <dt>Mode</dt>
+                <dd id="mode"></dd>
+                <dt>Direction</dt>
+                <dd id="direction"></dd>
+            </dl>
+
+            <div class="help">
+                <dl>
+                    <dt>H</dt>
+                    <dd>→</dd>
+                    <dt>J</dt>
+                    <dd>↓</dd>
+                    <dt>K</dt>
+                    <dd>↑</dd>
+                    <dt>L</dt>
+                    <dd>←</dd>
+                    <dt>ESC</dt>
+                    <dd>Automatic</dd>
+                </dl>
+            </div>
+        </div>
+        <div id="snake"></div>
+
+        <script type="text/javascript">
+            var App = {
+                MODE_AUTO: true,
+                MODE_MANUAL: false,
+                DIR_NORTH: 0,
+                DIR_EAST: 1,
+                DIR_SOUTH: 2,
+                DIR_WEST: 3
+            };
+
+            App.setMode = function(status) {
+                App.mode = status;
+                document.getElementById('mode').innerText = App.mode == App.MODE_AUTO ? 'Automatic' : 'Manual';
+            }
+
+            App.turn = function() {
+                do {
+                    App.setDir(Math.floor(Math.random()*4));
+                } while (!App.isValidDir() && App.isEnd());
+            }
+
+            App.isValidDir = function() {
+                var ex = App.x + App.dx*App.padding;
+                var ey = App.y + App.dy*App.padding;
+
+                return !(ex < 0 || ex >= App.width || ey < 0 || ey >= App.height || App.labyrinth[ex][ey]);
+            }
+
+            App.setDir = function(dir) {
+                var label = '';
+
+                switch (dir) {
+                    case App.DIR_NORTH:
+                        label = '↑';
+                        App.dx = 0;
+                        App.dy = -1;
+                        break;
+                    case App.DIR_EAST:
+                        label = '←';
+                        App.dx = 1;
+                        App.dy = 0;
+                        break;
+                    case App.DIR_SOUTH:
+                        label = '↓';
+                        App.dx = 0;
+                        App.dy = 1;
+                        break;
+                    case App.DIR_WEST:
+                        label = '→';
+                        App.dx = -1;
+                        App.dy = 0;
+                        break;
+                }
+
+                document.getElementById('direction').innerText = label;
+
+                App.addLine();
+            }
+
+            App.forceDir = function(dir) {
+                App.setDir(dir);
+                App.setMode(App.MODE_MANUAL);
+            }
+
+            App.addLine = function() {
+                App.line = document.createElement('div');
+                App.line.className = 'line';
+                App.root.appendChild(App.line);
+
+                App.lineTop = App.y;
+                App.lineLeft = App.x;
+                App.lineWidth = App.padding;
+                App.lineHeight = App.padding;
+
+                App.updateLine();
+            }
+
+            App.updateLine = function() {
+                App.line.style.top = App.lineTop;
+                App.line.style.left = App.lineLeft;
+                App.line.style.width = App.lineWidth;
+                App.line.style.height = App.lineHeight;
+            }
+
+            App.addDot = function() {
+                App.dot = document.createElement('div');
+                App.dot.className = 'dot';
+                App.dot.style.top = App.y;
+                App.dot.style.left = App.x;
+                App.dot.style.width = App.padding;
+                App.dot.style.height = App.padding;
+                App.root.appendChild(App.dot);
+            }
+
+            App.addWall = function(x, y) {
+                x = App.round(x);
+                y = App.round(y);
+
+                if (!App.labyrinth[x][y]) {
+                    var wallLeft = x;
+                    var wallTop = y;
+                    var wallHeight = App.padding;
+                    var wallWidth = App.padding;
+                    if (Math.random() > 0.5) {
+
+                        for (i = x; i >= 0; i = i - App.padding) {
+                            if (App.labyrinth[i][y]) {
+                                break;
+                            }
+                            App.labyrinth[i][y] = true;
+                            wallLeft = i;
+                        }
+                        for (i = x + App.padding; i < App.width; i = i + App.padding) {
+                            if (App.labyrinth[i][y]) {
+                                break;
+                            }
+                            App.labyrinth[i][y] = true;
+                            wallWidth = i-wallLeft+App.padding;
+                        }
+                    } else {
+                        for (i = y; i >= 0; i = i - App.padding) {
+                            if (App.labyrinth[x][i]) {
+                                break;
+                            }
+                            App.labyrinth[x][i] = true;
+                            wallTop = i;
+                        }
+                        for (i = y + App.padding; i < App.height; i = i + App.padding) {
+                            if (App.labyrinth[x][i]) {
+                                break;
+                            }
+                            App.labyrinth[x][i] = true;
+                            wallHeight = i-wallTop+App.padding;
+                        }
+                    }
+
+                    var wall = document.createElement('div');
+                    wall.className = 'wall';
+                    wall.style.top = wallTop;
+                    wall.style.left = wallLeft;
+                    wall.style.width = wallWidth;
+                    wall.style.height = wallHeight;
+                    App.root.appendChild(wall);
+                }
+            }
+
+            App.round = function(n) {
+                return Math.floor(n/App.padding)*App.padding;
+            }
+
+            App.init = function() {
+                App.setMode(App.MODE_AUTO);
+                App.padding = 12;
+                App.start = Date.now();
+
+                App.root = document.getElementById('snake');
+
+                App.width = App.round(App.root.offsetWidth);
+                App.height = App.round(App.root.offsetHeight);
+
+                App.root.style.width = App.width;
+                App.root.style.height = App.height;
+
+                App.x = App.round(App.width/2);
+                App.y = App.round(App.height/2);
+
+                App.root.onclick = function(e) {
+                    App.addWall(e.pageX - App.root.offsetLeft, e.pageY - App.root.offsetTop);
+                };
+
+                document.onkeydown=function(e) {
+                    if (e.keyCode == 27) {
+                        App.setMode(App.MODE_AUTO);
+                    } else {
+                        switch (String.fromCharCode(event.which)) {
+                            case 'J':
+                                App.forceDir(App.DIR_SOUTH);
+                                break;
+                            case 'K':
+                                App.forceDir(App.DIR_NORTH);
+                                break;
+                            case 'L':
+                                App.forceDir(App.DIR_EAST);
+                                break;
+                            case 'H':
+                                App.forceDir(App.DIR_WEST);
+                                break;
+                        }
+                    }
+                }
+
+                App.addDot();
+
+                App.labyrinth = [];
+                for (var i = 0; i < App.width; i = i + App.padding) {
+                    App.labyrinth[i] = [];
+                    for (var j = 0; j < App.height; j = j + App.padding) {
+                        App.labyrinth[i][j] = false;
+                    }
+                }
+                App.labyrinth[App.x][App.y] = true;
+
+                App.turn();
+            }
+
+            App.isEnd = function() {
+                return !(App.labyrinth[App.x][App.y-App.padding] && (App.labyrinth[App.x+App.padding] && App.labyrinth[App.x+App.padding][App.y]) && App.labyrinth[App.x][App.y+App.padding] && (App.labyrinth[App.x-App.padding][App.y] && App.labyrinth[App.x-App.padding][App.y]));
+            }
+
+            App.start = function() {
+                App.init();
+
+                App.timer = setInterval(function() {
+                    document.getElementById('time').innerText = (Date.now() - App.start)/1000;
+
+                    if (!App.isEnd()) {
+                        App.stop();
+                    }
+
+                    if (!App.isValidDir(App.dx, App.dy)) {
+                        if (App.mode == App.MODE_AUTO) {
+                            App.turn();
+                        } else {
+                            App.stop();
+                        }
+
+                    } else {
+                        App.x = App.x + App.dx*App.padding;
+                        App.y = App.y + App.dy*App.padding;
+                        App.labyrinth[App.x][App.y] = true;
+
+                        App.dot.style.top = App.y;
+                        App.dot.style.left = App.x;
+
+                        if (App.dx) {
+                            if (App.dx < 0) {
+                                App.lineLeft = App.lineLeft - App.padding;
+                            }
+                            App.lineWidth = App.lineWidth + App.padding;
+                        }
+
+                        if (App.dy) {
+                            if (App.dy < 0) {
+                                App.lineTop = App.lineTop - App.padding;
+                            }
+                            App.lineHeight = App.lineHeight + App.padding;
+                        }
+
+                        App.updateLine();
+                    }
+                }, 100);
+            }
+
+            App.stop = function() {
+                clearInterval(App.timer);
+            }
+
+            App.start();
+        </script>
+    </body>
+</html>
