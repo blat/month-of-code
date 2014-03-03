@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <title>Binary</title>
+        <style>
+            body {
+                margin: 0;
+                background: black;
+            }
+
+            canvas {
+                position: absolute;
+            }
+
+            #color {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <img id="color" src="image.jpg" />
+        <canvas></canvas>
+        <canvas></canvas>
+
+        <script type="text/javascript">
+            document.getElementById("color").onload = function(){
+
+                var canvas;
+                for (var i = 0; i < 2; i++) {
+                    canvas = document.getElementsByTagName("canvas")[i];
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+
+                    canvas.style.top = (document.body.offsetHeight - this.height)/2;
+                    canvas.style.left = (document.body.offsetWidth - this.width)/2;
+
+                    var context = canvas.getContext("2d");
+                    context.drawImage(this, 0, 0, this.width, this.height);
+
+                    var img = context.getImageData(0, 0, this.width, this.height);
+                    var data = img.data;
+
+                    for (var j = 0; j < data.length; j += 4) {
+                        var red = data[j];
+                        var green = data[j + 1];
+                        var blue = data[j + 2];
+
+                        var color = (green+blue+red > 127*3) ? (i ? 0 : 255) : (i ? 255 : 0);
+                        data[j] = data[j + 1] = data[j + 2] = color;
+                    }
+
+                    context.putImageData(img, 0, 0);
+                }
+
+                i = 0;
+                setInterval(function() {
+                    document.getElementsByTagName("canvas")[i].style.display = 'none';
+                    i = (i + 1) % 2;
+                    document.getElementsByTagName("canvas")[i].style.display = 'block';
+                }, 1000);
+            };
+        </script>
+    </body>
+</html>
