@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Bounce</title>
+        <style>
+            body {
+                background: #f9f9f9;
+            }
+
+            #bounce {
+                position:absolute;
+                width: 64px;
+                height: 65px;
+                bottom: 0;
+                left: 100px;
+                background: #1a1a1a;
+                border-radius: 32px;
+                -webkit-animation: bounce 0.35s ease-out infinite alternate;
+            }
+
+            @-webkit-keyframes bounce {
+                from { bottom: 0; width: 66px; height: 62px; }
+                to   { bottom: 100px; width: 64px; height: 64px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="bounce"></div>
+    </body>
+</html>
