@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Time</title>
+        <style>
+            body {
+                background: #222;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="time"></canvas>
+
+        <script type="text/javascript">
+            var height = document.body.offsetHeight;
+            var width = document.body.offsetWidth;
+
+            var base = height/20;
+            var canvas = document.getElementById("time");
+
+            setInterval(function() {
+                canvas.height = height;
+                canvas.width = width;
+
+                var now = new Date();
+                draw(base, '#837E93', now.getMilliseconds() / 1000);
+                draw(base*2.3, '#947E91', now.getSeconds() / 60);
+                draw(base*3.6, '#C7CDAF', now.getMinutes() / 60);
+                draw(base*4.9, '#D5D0B6', now.getHours() / 24);
+            }, 10);
+
+            function draw(radius, color, percent) {
+                var context = canvas.getContext("2d");
+                context.beginPath();
+                context.arc(width/2, height/2, radius, 1.5*Math.PI, percent*2*Math.PI-0.5*Math.PI);
+                context.strokeStyle = color;
+                context.lineWidth = base;
+                context.stroke();
+            }
+        </script>
+    </body>
+</html>
