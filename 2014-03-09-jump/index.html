@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>Jump</title>
+        <style>
+            body {
+                background: #f9f9f9;
+            }
+
+            #jump {
+                position:absolute;
+                width: 64px;
+                height: 65px;
+                bottom: 0;
+                left: 100px;
+                background: #1a1a1a;
+                border-radius: 32px;
+            }
+
+            .jump {
+                -webkit-animation: jump 0.35s ease-out;
+            }
+
+            @-webkit-keyframes jump {
+                from { bottom: 0; }
+                50%   { bottom: 100px; }
+                to { bottom: 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="jump"></div>
+
+        <script type="text/javascript">
+            var element = document.getElementById("jump");
+            var max = document.body.offsetHeight - element.offsetHeight;
+
+            var start;
+
+            document.onkeydown = down;
+            document.onkeyup = up;
+            document.onmousedown = down;
+            document.onmouseup = up;
+
+            function down() {
+                start = performance.now();
+            }
+
+            function up() {
+                stop = performance.now();
+                var diff = stop - start;
+
+                var ss = document.styleSheets;
+                for (var i = 0; i < ss.length; ++i) {
+                    for (var j = 0; j < ss[i].cssRules.length; ++j) {
+                        if (ss[i].cssRules[j].type == window.CSSRule.WEBKIT_KEYFRAMES_RULE && ss[i].cssRules[j].name == 'jump') {
+                            var bottom = diff/450*max;
+                            ss[i].cssRules[j].insertRule('50% { bottom: ' + bottom + 'px; }');
+                        }
+                    }
+                }
+
+                element.classList.add("jump");
+                setTimeout(function() {
+                    element.classList.remove("jump");
+                }, 350);
+            }
+        </script>
+    </body>
+</html>
