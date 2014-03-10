@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <title>Input</title>
+        <style>
+            body {
+                width: 800px;
+                margin: 100px auto;
+                text-align: center;
+                background: #ccc;
+            }
+            input {
+                width: 40%;
+                margin: 10px;
+            }
+            #top-right {
+                -webkit-transform: rotateY(180deg);
+                -moz-transform: rotateY(180deg);
+                transform: rotateY(180deg);
+            }
+            #bottom-left {
+                -webkit-transform: rotateX(180deg);
+                -moz-transform: rotateX(180deg);
+                transform: rotateX(180deg);
+            }
+            #bottom-right {
+                -webkit-transform: rotate(180deg);
+                -moz-transform: rotate(180deg);
+                transform: rotate(180deg);
+            }
+        </style>
+    </head>
+    <body>
+        <input type="text" id="top-left" />
+        <input type="text" id="top-right" />
+        <input type="text" id="bottom-left" />
+        <input type="text" id="bottom-right" />
+
+        <script type="text/javascript">
+            var inputs = document.getElementsByTagName("input");
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].onkeyup = function() {
+                    for (var j = 0; j < inputs.length; j++) {
+                        inputs[j].value = this.value;
+                    }
+                    return false;
+                }
+            }
+        </script>
+    </body>
+</html>
