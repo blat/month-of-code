@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>Mathematics</title>
+        <style>
+            body {
+                background: darkslategrey;
+            }
+
+            #prime {
+                color: white;
+                font-family: sans-serif;
+                font-size: 200px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="prime">1</div>
+
+        <script type="text/javascript">
+            var element = document.getElementById("prime");
+            element.style.marginTop = (document.body.offsetHeight - element.offsetHeight) / 2;
+
+            setInterval(function() {
+                var n = parseInt(element.innerText) + 1;
+                while (!isPrime(n)) {
+                    n++;
+                }
+                element.innerText = n;
+            }, 1000);
+
+            function isPrime(n) {
+                if (n < 2) return false;
+
+                for (var i = 2; i < n; i++) {
+                    if (n % i == 0) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        </script>
+    </body>
+</html>
